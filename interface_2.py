@@ -17,6 +17,8 @@ alt.themes.enable("dark")
 def plot_ndvi(df, y_variable):
     # Plotar o gráfico usando Plotly Express
     fig = px.line(df, x='Datetime', y=y_variable, title='Normalized Difference Vegetation Index (NDVI)')
+    fig.update_layout(yaxis_title=y_variable)
+    fig.update_yaxes(range=[0, 1])
     st.plotly_chart(fig)
 
 def main():
