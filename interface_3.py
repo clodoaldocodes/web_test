@@ -30,23 +30,26 @@ def main():
             
             # Verificar se as colunas 'Datetime' e 'ndvi' estão presentes em ambos os DataFrames
             if all('Datetime' in df.columns and 'Mean' in df.columns for df in dfs):
-                # Selecionar variáveis para os eixos x e y usando menu suspenso
-                y_variable = st.selectbox("Selecione a variável para o eixo y:", ['Mean'] + dfs[0].columns.tolist(), key="y_variable")
+                # Selecionar variável para o eixo y usando menu suspenso
+                y_variable_options = ['ndvi'] + dfs[0].columns.tolist()
                 
                 # Plotar gráficos separados
                 st.subheader("Gráficos Separados:")
                 for i, df in enumerate(dfs):
-                    x_variable = st.selectbox(f"Selecione a variável x para o gráfico {i+1}:", ['Datetime'] + df.columns.tolist(), key=f"x_variable_{i}")
+                    x_variable = 'Datetime'  # Manter a mesma variável x para todos os gráficos
+                    csv_name = uploaded_files[i].name
+                    y_variable = st.selectbox(f"Selecione a variável y para o gráfico {i+1} ({csv_name}):", y_variable_options, key=f"y_variable_{i}")
                     plot_ndvi(df, x_variable, y_variable, f"Gráfico {i+1}")
                 
                 # Plotar gráfico combinado
                 st.subheader("Gráfico Combinado:")
                 combined_df = pd.concat(dfs)
-                x_variable_combined = st.selectbox("Selecione a variável x para o gráfico combinado:", ['Datetime'] + combined_df.columns.tolist(), key="x_variable_combined")
-                plot_ndvi(combined_df, x_variable_combined, y_variable, "Gráfico Combinado")
+                x_variable_combined = 'Datetime'
+                y_variable_combined = st.selectbox("Selecione a variável y para o gráfico combinado:", y_variable_options, key="y_variable_combined")
+                plot_ndvi(combined_df, x_variable_combined, y_variable_combined, "Gráfico Combinado")
                 
             else:
-                st.error("Os arquivos CSV devem conter as colunas 'Datetime' e 'ndvi'.")
+                st.error("Os arquivos CSV devem conter as colunas 'Datetime' e 'Mean'.")
         except Exception as e:
             st.error(f"Ocorreu um erro ao processar o arquivo: {e}")
     elif uploaded_files is not None:
