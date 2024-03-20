@@ -14,9 +14,9 @@ st.set_page_config(
 # Enable dark theme for Altair
 alt.themes.enable("dark")
 
-def plot_ndvi(df):
+def plot_ndvi(df, y_variable):
     # Plotar o gráfico usando Plotly Express
-    fig = px.line(df, x='Datetime', y='Mean', title='Normalized Difference Vegetation Index (NDVI)')
+    fig = px.line(df, x='Datetime', y=y_variable, title='Normalized Difference Vegetation Index (NDVI)')
     st.plotly_chart(fig)
 
 def main():
@@ -30,10 +30,19 @@ def main():
             # Ler o arquivo CSV
             df = pd.read_csv(uploaded_file)
             
-            # Verificar se as colunas 'data' e 'ndvi' estão presentes
+            # Verificar se as colunas 'Datetime' e 'Mean' estão presentes
             if 'Datetime' in df.columns and 'Mean' in df.columns:
+                # Obter lista de variáveis para o eixo x
+                x_variables = df.columns.tolist()
+                
+                # Remover 'ndvi' da lista de variáveis para o eixo x
+                x_variables.remove('Datetime')
+                
+                # Selecionar variável para o eixo x usando menu suspenso
+                x_variable = st.selectbox("Selecione a variável para o eixo x:", x_variables)
+                
                 # Plotar o gráfico
-                plot_ndvi(df)
+                plot_ndvi(df, x_variable)
             else:
                 st.error("O arquivo CSV não contém as colunas 'Datetime' e 'Mean'.")
         except Exception as e:
