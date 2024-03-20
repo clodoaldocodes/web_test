@@ -1,21 +1,23 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
+import altair as alt
+
+#######################
+# Page configuration
+st.set_page_config(
+    page_title="NDVI Viewer",
+    page_icon="🌱",
+    layout="wide",
+    initial_sidebar_state="expanded")
+
+# Enable dark theme for Altair
+alt.themes.enable("dark")
 
 def plot_ndvi(df):
-    # Converter a coluna 'data' para o tipo datetime
-    df['data'] = pd.to_datetime(df['Datetime'])
-    
-    # Plotar o gráfico
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['data'], df['Mean'], marker='o', linestyle='-')
-    plt.title('Índice de Vegetação por Diferença Normalizada (NDVI)')
-    plt.xlabel('Data')
-    plt.ylabel('NDVI')
-    plt.grid(True)
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    st.pyplot(plt)
+    # Plotar o gráfico usando Plotly Express
+    fig = px.line(df, x='Datetime', y='Mean', title='Normalized Difference Vegetation Index (NDVI)')
+    st.plotly_chart(fig)
 
 def main():
     st.title('Visualizador de NDVI')
