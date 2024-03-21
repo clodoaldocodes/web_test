@@ -14,7 +14,7 @@ pip install streamlit pandas plotly
 Clone this repository and navigate to the project directory. Then run the following command:
 
 ```
-streamlit run main.py
+streamlit run interface_3.py
 ```
 
 This will launch the Streamlit application in your default web browser, allowing you to interact with the multispectral index analysis tool.
