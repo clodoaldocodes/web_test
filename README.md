@@ -1,4 +1,5 @@
 ## Iterative Screen for Multispectral Index Analysis
+![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.10846272-blue)
 
 This project provides an interactive screen for analyzing multispectral indices. It utilizes Streamlit, Pandas, Plotly Express, and Plotly Graph Objects to create a user-friendly interface for visualizing and interpreting multispectral data.
  
