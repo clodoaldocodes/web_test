@@ -14,24 +14,31 @@ st.set_page_config(
 def plot_ndvi(df, x_variable, y_variable, title):
     # Plotar o gráfico usando Plotly Express
     fig = px.line(df, x=x_variable, y=y_variable, title=title)
-    fig.update_layout(xaxis_title=x_variable, yaxis_title=y_variable)
+    fig.update_layout(xaxis_title=x_variable, yaxis_title=y_variable, title_x=0.5)  # Centralizar o título
     fig.update_yaxes(range=[0, 1])
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)  # Usando a largura total da tela
 
 def plot_ndvi_2(df1, df2, x_variable, y_variable1, y_variable2, title):
+    # Adicionar caixas de texto para personalizar as legendas
+    col1, col2 = st.columns(2)
+    with col1:
+        custom_legend1 = st.text_input("Legenda DataFrame 1:", value='DataFrame 1')
+    with col2:
+        custom_legend2 = st.text_input("Legenda DataFrame 2:", value='DataFrame 2')
+
     # Criar uma figura com dois subplots
     fig = go.Figure()
 
     # Adicionar o primeiro conjunto de dados ao primeiro subplot
-    fig.add_trace(go.Scatter(x=df1[x_variable], y=df1[y_variable1], mode='lines', name='DataFrame 1'))
+    fig.add_trace(go.Scatter(x=df1[x_variable], y=df1[y_variable1], mode='lines', name=custom_legend1))
 
     # Adicionar o segundo conjunto de dados ao segundo subplot
-    fig.add_trace(go.Scatter(x=df2[x_variable], y=df2[y_variable2], mode='lines', name='DataFrame 2'))
+    fig.add_trace(go.Scatter(x=df2[x_variable], y=df2[y_variable2], mode='lines', name=custom_legend2))
 
     # Atualizar o layout da figura
-    fig.update_layout(title=title, xaxis_title=x_variable, yaxis_title='NDVI')
+    fig.update_layout(title=title, xaxis_title=x_variable, yaxis_title='NDVI', title_x=0.5)  # Centralizar o título
     fig.update_yaxes(range=[0, 1])
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)  # Usando a largura total da tela
 
 def main():
     st.title('NDVI Viewer')
@@ -63,10 +70,14 @@ def main():
                 x_variable = 'Datetime'  # Manter a mesma variável x para todos os gráficos
                 csv_name1 = uploaded_files[0].name
                 csv_name2 = uploaded_files[1].name
-                y_variable1 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 1 ({csv_name1}):", y_variable_options, key="y_variable_1")  # Chave única
-                y_variable2 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 2 ({csv_name2}):", y_variable_options, key="y_variable_2")  # Chave única
+                col1, col2 = st.columns(2)
+                with col1:
+                    y_variable1 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 1 ({csv_name1}):", y_variable_options, key="y_variable_1")  # Chave única
+
+                with col2:
+                    y_variable2 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 2 ({csv_name2}):", y_variable_options, key="y_variable_2")  # Chave única
                 title = st.text_input("Digite o título para os gráficos sobrepostos:", "Gráficos Sobrepostos")
-                plot_ndvi_2(dfs[0], dfs[1], x_variable, y_variable1, y_variable2, "Gráficos Sobrepostos")
+                plot_ndvi_2(dfs[0], dfs[1], x_variable, y_variable1, y_variable2, title)
                 
             else:
                 st.error("Os arquivos CSV devem conter as colunas 'Datetime' e 'Mean'.")
