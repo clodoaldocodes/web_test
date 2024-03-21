@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 #######################
 # Page configuration
@@ -17,6 +18,21 @@ def plot_ndvi(df, x_variable, y_variable, title):
     fig.update_yaxes(range=[0, 1])
     st.plotly_chart(fig)
 
+def plot_ndvi_2(df1, df2, x_variable, y_variable1, y_variable2, title):
+    # Criar uma figura com dois subplots
+    fig = go.Figure()
+
+    # Adicionar o primeiro conjunto de dados ao primeiro subplot
+    fig.add_trace(go.Scatter(x=df1[x_variable], y=df1[y_variable1], mode='lines', name='DataFrame 1'))
+
+    # Adicionar o segundo conjunto de dados ao segundo subplot
+    fig.add_trace(go.Scatter(x=df2[x_variable], y=df2[y_variable2], mode='lines', name='DataFrame 2'))
+
+    # Atualizar o layout da figura
+    fig.update_layout(title=title, xaxis_title=x_variable, yaxis_title='NDVI')
+    fig.update_yaxes(range=[0, 1])
+    st.plotly_chart(fig)
+
 def main():
     st.title('NDVI Viewer')
     
@@ -29,24 +45,28 @@ def main():
             dfs = [pd.read_csv(file) for file in uploaded_files]
             
             # Verificar se as colunas 'Datetime' e 'ndvi' estão presentes em ambos os DataFrames
-            if all('Datetime' in df.columns and 'Mean' in df.columns for df in dfs):
+            if all(('datetime' in map(str.lower, df.columns)) and ('mean' in map(str.lower, df.columns)) for df in dfs):
                 # Selecionar variável para o eixo y usando menu suspenso
-                y_variable_options = ['ndvi'] + dfs[0].columns.tolist()
+                y_variable_options = ['Mean'] + dfs[0].columns.tolist()
                 
                 # Plotar gráficos separados
                 st.subheader("Gráficos Separados:")
                 for i, df in enumerate(dfs):
                     x_variable = 'Datetime'  # Manter a mesma variável x para todos os gráficos
                     csv_name = uploaded_files[i].name
-                    y_variable = st.selectbox(f"Selecione a variável y para o gráfico {i+1} ({csv_name}):", y_variable_options, key=f"y_variable_{i}")
-                    plot_ndvi(df, x_variable, y_variable, f"Gráfico {i+1}")
-                
-                # Plotar gráfico combinado
-                st.subheader("Gráfico Combinado:")
-                combined_df = pd.concat(dfs)
-                x_variable_combined = 'Datetime'
-                y_variable_combined = st.selectbox("Selecione a variável y para o gráfico combinado:", y_variable_options, key="y_variable_combined")
-                plot_ndvi(combined_df, x_variable_combined, y_variable_combined, "Gráfico Combinado")
+                    y_variable = st.selectbox(f"Selecione a variável y para o gráfico {i+1} ({csv_name}):", y_variable_options, key=f"y_variable_{i+1}_{csv_name}")  # Chave única
+                    title = st.text_input(f"Digite o título do gráfico {i+1} ({csv_name}):", f"Gráfico {i+1}")
+                    plot_ndvi(df, x_variable, y_variable, title)
+
+                # Plotar gráficos sobrepostos
+                st.subheader("Gráficos Sobrepostos:")
+                x_variable = 'Datetime'  # Manter a mesma variável x para todos os gráficos
+                csv_name1 = uploaded_files[0].name
+                csv_name2 = uploaded_files[1].name
+                y_variable1 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 1 ({csv_name1}):", y_variable_options, key="y_variable_1")  # Chave única
+                y_variable2 = st.selectbox(f"Selecione a variável y para o gráfico DataFrame 2 ({csv_name2}):", y_variable_options, key="y_variable_2")  # Chave única
+                title = st.text_input("Digite o título para os gráficos sobrepostos:", "Gráficos Sobrepostos")
+                plot_ndvi_2(dfs[0], dfs[1], x_variable, y_variable1, y_variable2, "Gráficos Sobrepostos")
                 
             else:
                 st.error("Os arquivos CSV devem conter as colunas 'Datetime' e 'Mean'.")
