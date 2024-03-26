@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def main():
     st.title("Análise Estatística de Dados")
@@ -16,7 +18,13 @@ def main():
         st.write("Resumo Estatístico:")
         st.write(df.describe())
 
-        # Outras análises estatísticas podem ser adicionadas aqui, conforme necessário
+        # Gráfico de percentil
+        st.write("Gráfico de Percentil:")
+        column_name = st.selectbox("Selecione a coluna para visualizar o gráfico de percentil", df.columns)
+        fig, ax = plt.subplots()
+        sns.histplot(df[column_name], kde=True, ax=ax)
+        ax.set_title("Distribuição dos Dados")
+        st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
