@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
 import scipy.stats as stats
 import plotly.graph_objs as go
-from scipy.stats import trim_mean, hmean, iqr, skew, kurtosis
 
 def ccdf(data):
     sorted_data = np.sort(data)
