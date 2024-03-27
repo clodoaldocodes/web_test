@@ -45,10 +45,25 @@ def main():
 
         # Boxplot
         with col3:
+            # Adicionando a opção de "Todas as variáveis"
+            df_columns = df.columns.tolist()
+            df_columns.insert(0, "Todas as variáveis")
+
+            # Interface Streamlit
             st.write("Boxplot:")
-            selected_column_boxplot = st.selectbox("Selecione a coluna para visualizar o boxplot", df.columns)
-            fig_boxplot = px.box(df, y=selected_column_boxplot)
-            st.plotly_chart(fig_boxplot, use_container_width=True)
+            selected_column_boxplot = st.selectbox("Selecione a coluna para visualizar o boxplot", df_columns)
+
+            fig = go.Figure()
+
+            if selected_column_boxplot == "Todas as variáveis":
+                for column in df.columns:
+                    fig.add_trace(go.Box(y=df[column], name=f'{column}'))
+            else:
+                fig.add_trace(go.Box(y=df[selected_column_boxplot], name=selected_column_boxplot))
+
+            fig.update_layout(title="Boxplot")
+
+            st.plotly_chart(fig, use_container_width=True)
 
         # CCDF
         with col4:
