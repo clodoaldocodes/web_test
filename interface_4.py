@@ -5,6 +5,7 @@ import plotly.express as px
 import numpy as np
 import scipy.stats as stats
 import plotly.graph_objs as go
+from scipy.stats import trim_mean, hmean, iqr, skew, kurtosis
 
 def ccdf(data):
     sorted_data = np.sort(data)
@@ -37,8 +38,18 @@ def main():
         
         # Resumo Estatístico
         with col2:
+            # Calcular as estatísticas de variância e desvio padrão
+            variance = df.var().rename('var')
+
+            # Criar uma lista contendo os DataFrames para concatenar
+            dataframes_to_concat = [df.describe(), variance.to_frame().T]
+
+            # Concatenar os DataFrames
+            summary_stats = pd.concat(dataframes_to_concat)
+
+            # Interface Streamlit
             st.write("Resumo Estatístico:")
-            st.write(df.describe())
+            st.write(summary_stats)
 
         # Organizando os gráficos lado a lado
         col3, col4 = st.columns(2)
@@ -131,6 +142,29 @@ def main():
             y = stats.norm.pdf(x, mean, std)
             fig.add_scatter(x=x, y=y, mode='lines', name='Função Normal Ajustada')
             st.plotly_chart(fig)
+        
+        col7, col8 = st.columns(2)
+
+        with col7:
+            # Interface Streamlit
+            st.write("Gráfico de Correlação (Scatter Plot):")
+            selected_columns = st.multiselect("Selecione duas colunas para visualizar a correlação", df.columns)
+
+            if len(selected_columns) == 2:
+                corr_matrix = df[selected_columns].corr()
+                fig = px.imshow(corr_matrix,
+                                labels=dict(color="Correlação"),
+                                color_continuous_scale='RdBu_r',
+                                zmin=-1, zmax=1)
+                
+                for i in range(len(corr_matrix)):
+                    for j in range(len(corr_matrix)):
+                        fig.add_annotation(x=i, y=j, text=str(round(corr_matrix.iloc[i, j], 2)),
+                                        showarrow=False, font=dict(color='black' if abs(corr_matrix.iloc[i, j]) < 0.5 else 'white'))
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.write("Selecione exatamente duas colunas.")
 
 if __name__ == "__main__":
     main()
